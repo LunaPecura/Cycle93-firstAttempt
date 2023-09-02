@@ -1,62 +1,84 @@
 
+
 // Set port
 const PORT = 3000;
 
-// Imports
+// Load & instantiate express
 const express = require('express');
 const app = express();
+
 require('dotenv').config();
 const mongoose = require('mongoose');
-const User = require('./models/user');
+const Data = require('./models/data.js');
+const User = require('./models/user.js');
+const methodOverride = require('method-override')
+
 
 // Middleware
 app.set('view engine', 'jsx');
 app.engine('jsx', require('express-react-views').createEngine());
 app.use(express.urlencoded({extended:true}));
-
+app.use(methodOverride('_method'))
+app.use((req, res, next) => { /* console.log(''); */ next(); });
 
 // Connect to Mongoose
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-mongoose.connection.once('open', () => { console.log('connected to mongo'); });
+mongoose.connection.once('open', () => { console.log("Connected to mongo"); });
 
 
 
+// === Routes ==========================================================
 
-// Routes
-app.get('/', (req, res) => {res.send('<h1>Hello World!</h1>');});
+// Main route
+app.get('/', (req, res) => { res.send("<h1>Main</h1>"); })
 
-// Index route
-app.get('/users', async (req, res) => {
-	User.find({}).then( allData => {
+// Index route 
+app.get('/data', async (req, res) => {
+	Data.find({}).then( allData => {
 		res.render('Index', { data: allData });
 	});
-})
-
-// New User route
-app.post('/users/', async (req, res) => {
-    User.create(req.body).then( newUser => {
-        res.send(newUser);
-		res.redirect('/users');
-    });
 });
 
+// Post route
+app.post('/data', async (req, res) => {
+	req.body.attr1 = req.body.attr1 === 'on';
+	Data.create(req.body).then( newData => {
+		res.send(newData);
+		// res.redirect('/data');
+	})
+});
 
 // Create route
-app.get('/users/new', (req, res) => { 
-	res.render('New'); 
-	// res.redirect('/users/')
+app.get('/data/new', (req, res) => { res.render('New'); });
+
+// Delete route
+app.delete('/data/:index', async (req, res) => {
+	await Data.findByIdAndRemove(req.params.index)
+	res.redirect('/data')
 });
 
+// Update route
+app.put('/data/:index', async (req, res) => {
+	req.body.attr1 = req.body.attr1 === 'on';
+	await Data.findByIdAndUpdate(req.params.index, req.body);
+	res.redirect(`/data/${req.params.index}`);
+});
+
+// Edit route
+app.get('/data/:index/edit', async (req, res) => {
+	const foundItem =  await Data.findById(req.params.index) 
+	res.render('Edit', {item: foundItem})
+})
 
 // Show route 
-app.get("/users/:id", async (req, res) => {
-	const foundUser = await Data.findById(req.params.id);
-	res.render('Show', {item: foundUser})
+app.get("/data/:index", async (req, res) => {
+	const foundItem = await Data.findById(req.params.index);
+	res.render('Show', {item: foundItem})
 });
 
 
 
-// Obligatory 'Listening on…'
+
 app.listen(PORT, () => {
-	console.log(`Listening on port ${PORT}`);
-});
+	console.log(`Listening on port ${PORT}`)
+})

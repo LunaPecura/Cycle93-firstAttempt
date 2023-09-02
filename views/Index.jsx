@@ -6,18 +6,14 @@ const Index = ({ data }) => {
 
 		<li style={{border: '1px solid gray', margin: '10px', padding: '10px'}} key={index}>
 		
-
-			{item.firstName}
-			{item.lastName}
-
-			{/* The item <a href={`/data/${index}`}>{item.name}</a> has ID {item.id}, 
+			The item <a href={`/data/${item._id}`}>{item.name}</a> has ID {item.id}, 
 			and its Boolean attribute 'attr1' is set to '{String(item.attr1)}'.<br />
 
 			<a href={`/data/${item._id}/edit`}>Edit</a>
-			<form action={`/data/${item._id}?_method=DELETE`} method="POST"  >
-				<input type="submit" value="DELETE"/>
-			</form>
-		 */}
+				<form action={`/data/${item._id}?_method=DELETE`} method="POST"  >
+					<input type="submit" value="DELETE"/>
+				</form>
+		
 		</li> 
 
 	);})
@@ -27,7 +23,7 @@ const Index = ({ data }) => {
 		<div>
             <h1 style={{textAlign: 'center'}}>Index Page</h1>
             <ul>{ itemList }</ul>
-			<nav><a href="/users/new">Create new user</a></nav>
+			<nav><a href="/data/new">Create some new data</a></nav>
         </div>
 	)
 }
