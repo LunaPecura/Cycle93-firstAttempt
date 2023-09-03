@@ -39,6 +39,13 @@ app.get('/data', async (req, res) => {
 	});
 });
 
+// Index route USER
+app.get('/users', async (req, res) => {
+	User.find({}).then( allData => {
+		res.render('UserIndex', { data: allData });
+	});
+});
+
 // Post route
 app.post('/data', async (req, res) => {
 	req.body.attr1 = req.body.attr1 === 'on';
@@ -48,13 +55,31 @@ app.post('/data', async (req, res) => {
 	})
 });
 
+// Post route USER
+app.post('/users', async (req, res) => {
+	// req.body.attr1 = req.body.attr1 === 'on';
+	User.create(req.body).then( newData => {
+		res.send(newData);
+		// res.redirect('/data');
+	})
+});
+
 // Create route
 app.get('/data/new', (req, res) => { res.render('New'); });
+
+// Create route USER
+app.get('/users/new', (req, res) => { res.render('UserNew'); });
 
 // Delete route
 app.delete('/data/:index', async (req, res) => {
 	await Data.findByIdAndRemove(req.params.index)
 	res.redirect('/data')
+});
+
+// Delete route USER
+app.delete('/users/:index', async (req, res) => {
+	await User.findByIdAndRemove(req.params.index)
+	res.redirect('/users')
 });
 
 // Update route
@@ -64,16 +89,35 @@ app.put('/data/:index', async (req, res) => {
 	res.redirect(`/data/${req.params.index}`);
 });
 
+// Update route USER
+app.put('/users/:index', async (req, res) => {
+	// req.body.attr1 = req.body.attr1 === 'on';
+	await User.findByIdAndUpdate(req.params.index, req.body);
+	res.redirect(`/users/${req.params.index}`);
+});
+
 // Edit route
 app.get('/data/:index/edit', async (req, res) => {
 	const foundItem =  await Data.findById(req.params.index) 
 	res.render('Edit', {item: foundItem})
 })
 
+// Edit route USER
+app.get('/users/:index/edit', async (req, res) => {
+	const foundItem =  await User.findById(req.params.index) 
+	res.render('UserEdit', {item: foundItem})
+})
+
 // Show route 
 app.get("/data/:index", async (req, res) => {
 	const foundItem = await Data.findById(req.params.index);
 	res.render('Show', {item: foundItem})
+});
+
+// Show route USER
+app.get("/users/:index", async (req, res) => {
+	const foundItem = await User.findById(req.params.index);
+	res.render('UserShow', {item: foundItem})
 });
 
 
